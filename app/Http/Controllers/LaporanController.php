@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreLaporanRequest;
 use App\Models\Distribusi;
 use App\Models\Laporan;
-use Illuminate\Support\Facades\Auth;
+use App\Services\LaporanService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
@@ -33,12 +33,9 @@ class LaporanController extends Controller
         return view('laporan.create', compact('distribusi'));
     }
 
-    public function store(StoreLaporanRequest $request)
+    public function store(StoreLaporanRequest $request, LaporanService $laporanService)
     {
-        $laporan = new Laporan($request->validated());
-        $laporan->pelapor_id = Auth::id();
-        $laporan->status = Laporan::STATUS_DIKIRIM;
-        $laporan->save();
+        $laporanService->buat($request->user(), $request->validated());
 
         return redirect()
             ->route('laporan.index')
