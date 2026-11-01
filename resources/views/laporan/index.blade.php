@@ -68,5 +68,21 @@
         </tbody>
     </table>
 
-    {{ $laporan->links() }}
+    @if ($laporan->hasPages())
+        <nav aria-label="Navigasi halaman laporan">
+            @if ($laporan->onFirstPage())
+                <span aria-disabled="true">Sebelumnya</span>
+            @else
+                <a href="{{ $laporan->previousPageUrl() }}">Sebelumnya</a>
+            @endif
+
+            <span>Halaman {{ $laporan->currentPage() }} dari {{ $laporan->lastPage() }}</span>
+
+            @if ($laporan->hasMorePages())
+                <a href="{{ $laporan->nextPageUrl() }}">Selanjutnya</a>
+            @else
+                <span aria-disabled="true">Selanjutnya</span>
+            @endif
+        </nav>
+    @endif
 @endsection
