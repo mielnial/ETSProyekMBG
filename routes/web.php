@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\LaporanController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'home')
@@ -15,3 +16,12 @@ Route::middleware('guest')->group(function (): void {
 Route::post('/logout', [AuthController::class, 'logout'])
     ->middleware('auth')
     ->name('logout');
+
+Route::middleware('auth')->group(function (): void {
+    Route::get('/laporan', [LaporanController::class, 'index'])
+        ->middleware('role:pelapor')
+        ->name('laporan.index');
+
+    Route::get('/laporan/{laporan}', [LaporanController::class, 'show'])
+        ->name('laporan.show');
+});
