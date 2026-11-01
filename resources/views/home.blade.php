@@ -10,5 +10,9 @@
         @if (auth()->user()->isPelapor())
             <p><a href="{{ route('laporan.index') }}">Laporan Saya</a></p>
         @endif
+
+        @if (auth()->user()->isPemantau() || auth()->user()->isKoordinator())
+            <p><a href="{{ route('rekap.index') }}">Lihat Rekap Laporan</a></p>
+        @endif
     </section>
 @endsection

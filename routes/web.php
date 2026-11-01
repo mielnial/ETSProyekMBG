@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\RekapController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'home')
@@ -18,6 +19,10 @@ Route::post('/logout', [AuthController::class, 'logout'])
     ->name('logout');
 
 Route::middleware('auth')->group(function (): void {
+    Route::get('/rekap', [RekapController::class, 'index'])
+        ->middleware('role:pemantau,koordinator')
+        ->name('rekap.index');
+
     Route::get('/laporan', [LaporanController::class, 'index'])
         ->middleware('role:pelapor')
         ->name('laporan.index');
