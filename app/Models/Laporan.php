@@ -8,6 +8,23 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Laporan extends Model
 {
+    public const STATUS_DIKIRIM = 'dikirim';
+
+    public const STATUS_SEDANG_DITINJAU = 'sedang_ditinjau';
+
+    public const STATUS_PERLU_DILENGKAPI = 'perlu_dilengkapi';
+
+    public const STATUS_DITANDAI_UNTUK_DITERUSKAN = 'ditandai_untuk_diteruskan';
+
+    public const STATUS_INFORMASI_DITERUSKAN = 'informasi_diteruskan';
+
+    public const STATUS_DITUTUP = 'ditutup';
+
+    public const STATUSES_EDITABLE_BY_PELAPOR = [
+        self::STATUS_DIKIRIM,
+        self::STATUS_PERLU_DILENGKAPI,
+    ];
+
     protected $table = 'laporan';
 
     protected $fillable = [
