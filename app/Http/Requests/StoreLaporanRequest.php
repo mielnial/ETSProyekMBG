@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Models\Laporan;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreLaporanRequest extends FormRequest
 {
@@ -24,7 +25,13 @@ class StoreLaporanRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'distribusi_id' => ['required', 'integer', 'exists:distribusi,id'],
+            'sekolah_id' => ['required', 'integer', 'exists:sekolah,id'],
+            'distribusi_id' => [
+                'required',
+                'integer',
+                Rule::exists('distribusi', 'id')
+                    ->where(fn ($query) => $query->where('sekolah_id', $this->input('sekolah_id'))),
+            ],
             'waktu_kejadian' => ['required', 'date'],
             'jumlah_terdampak' => ['required', 'integer', 'min:1'],
             'gejala' => ['required', 'string', 'max:2000'],

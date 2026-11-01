@@ -6,7 +6,9 @@ use App\Http\Requests\StoreLaporanRequest;
 use App\Http\Requests\UpdateLaporanRequest;
 use App\Models\Distribusi;
 use App\Models\Laporan;
+use App\Models\Sekolah;
 use App\Services\LaporanService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
@@ -27,12 +29,26 @@ class LaporanController extends Controller
     {
         Gate::authorize('create', Laporan::class);
 
-        $distribusi = Distribusi::query()
-            ->with('sekolah')
-            ->orderByDesc('tanggal_distribusi')
-            ->get();
+        $sekolah = Sekolah::query()
+            ->orderBy('nama')
+            ->get(['id', 'nama']);
 
-        return view('laporan.create', compact('distribusi'));
+        return view('laporan.create', compact('sekolah'));
+    }
+
+    public function distribusiUntukSekolah(Sekolah $sekolah): JsonResponse
+    {
+        $distribusi = $sekolah->distribusi()
+            ->orderByDesc('tanggal_distribusi')
+            ->get(['id', 'tanggal_distribusi', 'menu', 'jumlah_porsi'])
+            ->map(fn (Distribusi $item): array => [
+                'id' => $item->id,
+                'tanggal' => $item->tanggal_distribusi->format('d-m-Y'),
+                'menu' => $item->menu,
+                'jumlah_porsi' => $item->jumlah_porsi,
+            ]);
+
+        return response()->json($distribusi);
     }
 
     public function edit(Laporan $laporan)

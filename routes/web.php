@@ -26,6 +26,10 @@ Route::middleware('auth')->group(function (): void {
         ->middleware('role:pelapor')
         ->name('laporan.create');
 
+    Route::get('/sekolah/{sekolah}/distribusi', [LaporanController::class, 'distribusiUntukSekolah'])
+        ->middleware('role:pelapor')
+        ->name('laporan.sekolah.distribusi');
+
     Route::get('/laporan/{laporan}/edit', [LaporanController::class, 'edit'])
         ->name('laporan.edit');
 
