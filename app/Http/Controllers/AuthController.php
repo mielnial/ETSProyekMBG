@@ -22,7 +22,7 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
-            return redirect()->intended(route('produk.index'));
+            return redirect()->intended('/');
         }
 
         return back()
@@ -36,6 +36,6 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('produk.index');
+        return redirect()->route('login');
     }
 }

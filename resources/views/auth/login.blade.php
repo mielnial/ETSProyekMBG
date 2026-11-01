@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Login - Toko Alat Tulis</title>
+    <title>Masuk - {{ config('app.name', 'MBG Monitor') }}</title>
     <style>
-        body { font-family: sans-serif; background: #f5f5f5; margin: 0; }
+        body { font-family: sans-serif; background: #f5f5f5; margin: 0; color: #222; }
         .box { max-width: 340px; margin: 4rem auto; background: #fff; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,.15); }
         h1 { margin-top: 0; }
         label { display: block; margin-top: .75rem; }
@@ -16,8 +16,8 @@
 </head>
 <body>
     <div class="box">
-        <h1>Login</h1>
-        <p>Masuk untuk berbelanja.</p>
+        <h1>{{ config('app.name', 'MBG Monitor') }}</h1>
+        <p>Masuk untuk melanjutkan.</p>
 
         @error('login')
             <p class="error">{{ $message }}</p>
@@ -33,8 +33,6 @@
 
             <button type="submit">Masuk</button>
         </form>
-
-        <p><a href="{{ route('produk.index') }}">&laquo; Kembali ke toko</a></p>
     </div>
 </body>
 </html>
