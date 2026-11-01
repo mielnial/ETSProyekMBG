@@ -4,6 +4,12 @@ Aplikasi mini project untuk mencatat dan memantau laporan terkait pelaksanaan di
 
 Repo: [mielnial/ETSProyekMBG](https://github.com/mielnial/ETSProyekMBG)
 
+## Identitas Mahasiswa
+
+- Nama: Muhammad Hilmi Farahat
+- NIM: 251511049
+- Kelas: 2B-D3
+
 ## Fitur
 
 - Login dengan akun yang memiliki peran Pelapor, Pemantau, atau Koordinator.
