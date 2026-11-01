@@ -1,58 +1,128 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# MBG Monitor
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikasi mini project untuk mencatat dan memantau laporan terkait pelaksanaan distribusi makanan MBG di sekolah. Aplikasi ini dibuat dengan Laravel 13 dan menggunakan tiga peran: Pelapor, Pemantau, dan Koordinator.
 
-## About Laravel
+Repo: [mielnial/ETSProyekMBG](https://github.com/mielnial/ETSProyekMBG)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Fitur
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- Login dengan akun yang memiliki peran Pelapor, Pemantau, atau Koordinator.
+- Pelapor membuat laporan, melihat laporan miliknya, dan memperbarui laporan saat statusnya masih `dikirim` atau `perlu_dilengkapi`.
+- Pemilihan sekolah dan distribusi yang saling terhubung; daftar distribusi dimuat tanpa memuat ulang halaman.
+- Validasi aturan laporan: satu laporan aktif per Pelapor pada distribusi yang sama, waktu kejadian tidak mendahului tanggal distribusi dan tidak berada di masa depan.
+- Unggah bukti JPG, JPEG, PNG, atau PDF maksimal 2 MB. Berkas disimpan privat dan hanya dapat diunduh setelah melewati pemeriksaan akses.
+- Pencarian, filter status, dan pagination pada daftar laporan Pelapor.
+- Rekap jumlah laporan per status untuk Pemantau dan Koordinator. Akses Koordinator hanya mencakup laporan yang ditandai atau sudah diteruskan, termasuk laporan tertutup yang memiliki catatan penerusan.
+- Observer mencatat perubahan status ke `log_status_laporan` ketika status laporan berubah melalui Eloquent.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Teknologi dan prasyarat
 
-## Learning Laravel
+- PHP 8.3 atau lebih baru, dengan ekstensi `pdo_mysql`, `mbstring`, dan `openssl` aktif.
+- Composer.
+- MySQL atau MariaDB.
+- Browser web modern.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Menjalankan di Windows
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+1. Clone repo dan masuk ke folder proyek:
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+   ```powershell
+   git clone https://github.com/mielnial/ETSProyekMBG.git
+   Set-Location ETSProyekMBG
+   ```
 
-## Agentic Development
+2. Pasang dependency PHP:
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+   ```powershell
+   composer install
+   ```
 
-```bash
-composer require laravel/boost --dev
+3. Buat berkas konfigurasi lokal dan kunci aplikasi:
 
-php artisan boost:install
+   ```powershell
+   Copy-Item .env.example .env
+   php artisan key:generate
+   ```
+
+   Jika `.env` sudah ada, jangan menimpanya. Sesuaikan konfigurasi database pada `.env` dengan MySQL lokalmu:
+
+   ```dotenv
+   APP_NAME="MBG Monitor"
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=mbg_db
+   DB_USERNAME=root
+   DB_PASSWORD=
+   SESSION_DRIVER=file
+   ```
+
+   Ganti nama pengguna dan password database jika konfigurasi MySQL-mu berbeda. Jangan masukkan `.env` ke Git.
+
+   Zona waktu aplikasi sudah diatur ke `Asia/Jakarta` pada `config/app.php`. Setelah mengubah `.env`, bersihkan cache konfigurasi:
+
+   ```powershell
+   php artisan config:clear
+   ```
+
+4. Buat database kosong di MySQL atau phpMyAdmin:
+
+   ```sql
+   CREATE DATABASE mbg_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+   ```
+
+5. Buat tabel dan data demo:
+
+   ```powershell
+   php artisan migrate:fresh --seed
+   ```
+
+   **Perhatian:** perintah ini menghapus tabel dan data pada database yang dikonfigurasi, lalu membuatnya ulang. Gunakan hanya pada database pengembangan yang boleh direset.
+
+6. Jalankan aplikasi:
+
+   ```powershell
+   php artisan serve
+   ```
+
+7. Buka [http://127.0.0.1:8000](http://127.0.0.1:8000) di browser.
+
+## Akun demo
+
+Semua akun menggunakan password `mbg-demo-2026`. Password ini hanya untuk demonstrasi lokal, bukan untuk penggunaan nyata.
+
+| Username | Nama | Peran |
+| --- | --- | --- |
+| `rina` | Rina Puspita | Pelapor |
+| `budi` | Budi Pratama | Pelapor |
+| `dedi` | Dedi Wiratama | Pemantau |
+| `sari` | Sari Nirmala | Koordinator |
+
+Data sekolah, distribusi, laporan, dan nama pada seeder adalah data fiktif. Tanggal distribusi dibuat relatif terhadap waktu seeder dijalankan.
+
+## Halaman utama
+
+| URL | Akses | Keterangan |
+| --- | --- | --- |
+| `/` | Semua pengguna yang sudah login | Beranda sesuai akun |
+| `/laporan` | Pelapor | Daftar laporan milik sendiri, pencarian, filter status, dan pagination |
+| `/laporan/create` | Pelapor | Form membuat laporan |
+| `/laporan/{id}` | Sesuai Policy | Detail laporan sesuai peran dan kepemilikan |
+| `/laporan/{id}/edit` | Pemilik laporan | Form edit saat status mengizinkan |
+| `/rekap` | Pemantau dan Koordinator | Ringkasan dan daftar laporan sesuai hak akses |
+
+Endpoint unduh bukti juga memeriksa Policy sebelum mengirim berkas. Berkas bukti tidak disajikan langsung dari folder publik.
+
+## Data dan log status
+
+Tabel inti aplikasi adalah `users`, `sekolah`, `distribusi`, `laporan`, `catatan_peninjauan`, `penerusan_informasi`, dan `log_status_laporan`. Relasi dan kebijakan penghapusan foreign key dibuat melalui migration.
+
+`LaporanObserver` mencatat status lama, status baru, pengguna yang melakukan perubahan (bisa kosong untuk proses tanpa pengguna login), dan waktu perubahan. Membuat laporan baru dengan status awal `dikirim` tidak membuat entri perubahan status.
+
+## Riwayat pengerjaan
+
+Perubahan dikirim melalui commit bertahap berdasarkan bagian pekerjaan. Riwayat dapat dilihat dengan:
+
+```powershell
+git log --oneline
 ```
-
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
