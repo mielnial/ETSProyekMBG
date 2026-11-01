@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Laporan;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class RekapController extends Controller
 {
@@ -21,6 +22,10 @@ class RekapController extends Controller
             Laporan::STATUS_DITUTUP => 'Ditutup',
         ];
 
+        $filters = $request->validate([
+            'status' => ['nullable', Rule::in(array_keys($statusLabels))],
+        ]);
+
         $query = Laporan::query();
 
         if ($user->isKoordinator()) {
@@ -34,6 +39,11 @@ class RekapController extends Controller
                 });
             });
         }
+
+        $query->when(
+            $filters['status'] ?? null,
+            fn (Builder $query, string $status) => $query->where('status', $status),
+        );
 
         $jumlahPerStatus = (clone $query)
             ->selectRaw('status, COUNT(*) AS jumlah')
@@ -55,6 +65,6 @@ class RekapController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        return view('rekap.index', compact('laporan', 'ringkasan'));
+        return view('rekap.index', compact('laporan', 'ringkasan', 'filters', 'statusLabels'));
     }
 }

@@ -13,6 +13,20 @@
         @endif
     </p>
 
+    <form method="GET" action="{{ route('rekap.index') }}">
+        <label for="status">Filter status</label>
+        <select id="status" name="status">
+            <option value="">Semua status yang dapat diakses</option>
+            @foreach ($statusLabels as $value => $label)
+                <option value="{{ $value }}" @selected(($filters['status'] ?? '') === $value)>
+                    {{ $label }}
+                </option>
+            @endforeach
+        </select>
+        <button type="submit">Terapkan</button>
+        <a href="{{ route('rekap.index') }}">Reset</a>
+    </form>
+
     <h3>Jumlah laporan per status</h3>
     <table border="1" cellpadding="8" cellspacing="0">
         <thead>
