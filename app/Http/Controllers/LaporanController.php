@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreLaporanRequest;
+use App\Http\Requests\UpdateLaporanRequest;
 use App\Models\Distribusi;
 use App\Models\Laporan;
 use App\Services\LaporanService;
@@ -34,6 +35,20 @@ class LaporanController extends Controller
         return view('laporan.create', compact('distribusi'));
     }
 
+    public function edit(Laporan $laporan)
+    {
+        Gate::authorize('update', $laporan);
+
+        $laporan->load('distribusi.sekolah');
+
+        $distribusi = Distribusi::query()
+            ->with('sekolah')
+            ->orderByDesc('tanggal_distribusi')
+            ->get();
+
+        return view('laporan.edit', compact('laporan', 'distribusi'));
+    }
+
     public function store(StoreLaporanRequest $request, LaporanService $laporanService)
     {
         $laporanService->buat($request->user(), $request->validated());
@@ -41,6 +56,15 @@ class LaporanController extends Controller
         return redirect()
             ->route('laporan.index')
             ->with('status', 'Laporan berhasil dikirim.');
+    }
+
+    public function update(UpdateLaporanRequest $request, Laporan $laporan, LaporanService $laporanService)
+    {
+        $laporanService->perbarui($request->user(), $laporan, $request->validated());
+
+        return redirect()
+            ->route('laporan.show', $laporan)
+            ->with('status', 'Laporan berhasil diperbarui.');
     }
 
     public function show(Request $request, Laporan $laporan)

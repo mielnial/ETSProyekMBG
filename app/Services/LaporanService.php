@@ -87,4 +87,92 @@ class LaporanService
             throw $exception;
         }
     }
+
+    public function perbarui(User $pelapor, Laporan $laporan, array $data): Laporan
+    {
+        $bukti = $data['bukti'] ?? null;
+        $pathBuktiLama = $laporan->bukti_path;
+        $pathBuktiBaru = null;
+        unset($data['bukti']);
+
+        try {
+            $laporan = DB::transaction(function () use ($pelapor, $laporan, $data, $bukti, &$pathBuktiBaru): Laporan {
+                $distribusi = Distribusi::findOrFail($data['distribusi_id']);
+                $waktuKejadian = Carbon::parse($data['waktu_kejadian']);
+
+                $laporanAktifLain = Laporan::query()
+                    ->where('pelapor_id', $pelapor->getKey())
+                    ->where('distribusi_id', $distribusi->getKey())
+                    ->where('status', '!=', Laporan::STATUS_DITUTUP)
+                    ->where('id', '!=', $laporan->getKey())
+                    ->exists();
+
+                $errors = [];
+
+                if ($laporanAktifLain) {
+                    $errors['distribusi_id'] = 'Anda masih memiliki laporan aktif untuk distribusi ini. Tunggu sampai laporan tersebut ditutup sebelum mengirim laporan baru.';
+                }
+
+                $tanggalDistribusi = $distribusi->tanggal_distribusi
+                    ->copy()
+                    ->startOfDay();
+
+                if ($waktuKejadian->lt($tanggalDistribusi)) {
+                    $errors['waktu_kejadian'] = 'Waktu kejadian tidak boleh lebih awal daripada tanggal distribusi.';
+                }
+
+                if ($waktuKejadian->gt(now())) {
+                    $errors['waktu_kejadian'] = 'Waktu kejadian tidak boleh berada di masa depan.';
+                }
+
+                if ($errors !== []) {
+                    throw ValidationException::withMessages($errors);
+                }
+
+                $laporan->fill([
+                    'distribusi_id' => $distribusi->getKey(),
+                    'waktu_kejadian' => $waktuKejadian,
+                    'jumlah_terdampak' => $data['jumlah_terdampak'],
+                    'gejala' => $data['gejala'],
+                    'uraian' => $data['uraian'],
+                ]);
+
+                if ($laporan->status === Laporan::STATUS_PERLU_DILENGKAPI) {
+                    $laporan->status = Laporan::STATUS_DIKIRIM;
+                }
+
+                $laporan->save();
+
+                if ($bukti !== null) {
+                    $pathBuktiBaru = $bukti->store('bukti-laporan', 'private');
+
+                    if ($pathBuktiBaru === false) {
+                        throw new RuntimeException('Bukti laporan gagal disimpan.');
+                    }
+
+                    $laporan->bukti_path = $pathBuktiBaru;
+                    $laporan->bukti_nama_asli = $bukti->getClientOriginalName();
+                    $laporan->save();
+                }
+
+                return $laporan;
+            });
+        } catch (Throwable $exception) {
+            if ($pathBuktiBaru !== null) {
+                Storage::disk('private')->delete($pathBuktiBaru);
+            }
+
+            throw $exception;
+        }
+
+        if ($pathBuktiBaru !== null && $pathBuktiLama !== null && $pathBuktiLama !== $pathBuktiBaru) {
+            try {
+                Storage::disk('private')->delete($pathBuktiLama);
+            } catch (Throwable $exception) {
+                report($exception);
+            }
+        }
+
+        return $laporan;
+    }
 }

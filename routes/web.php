@@ -26,12 +26,18 @@ Route::middleware('auth')->group(function (): void {
         ->middleware('role:pelapor')
         ->name('laporan.create');
 
+    Route::get('/laporan/{laporan}/edit', [LaporanController::class, 'edit'])
+        ->name('laporan.edit');
+
     Route::post('/laporan', [LaporanController::class, 'store'])
         ->middleware('role:pelapor')
         ->name('laporan.store');
 
     Route::get('/laporan/{laporan}/bukti', [LaporanController::class, 'downloadBukti'])
         ->name('laporan.bukti');
+
+    Route::put('/laporan/{laporan}', [LaporanController::class, 'update'])
+        ->name('laporan.update');
 
     Route::get('/laporan/{laporan}', [LaporanController::class, 'show'])
         ->name('laporan.show');

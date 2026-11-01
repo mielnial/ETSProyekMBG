@@ -44,5 +44,9 @@
         @endif
     </dl>
 
+    @can('update', $laporan)
+        <p><a href="{{ route('laporan.edit', $laporan) }}">Edit laporan</a></p>
+    @endcan
+
     <a href="{{ auth()->user()->isPelapor() ? route('laporan.index') : route('home') }}">Kembali</a>
 @endsection
