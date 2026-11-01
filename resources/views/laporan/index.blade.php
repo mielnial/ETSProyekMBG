@@ -5,6 +5,8 @@
 @section('content')
     <h2>Laporan Saya</h2>
 
+    <p><a href="{{ route('laporan.create') }}">Buat Laporan</a></p>
+
     <table border="1" cellpadding="8" cellspacing="0" width="100%">
         <thead>
             <tr>

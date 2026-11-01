@@ -6,5 +6,9 @@
     <section>
         <h2>Selamat datang</h2>
         <p>Anda berhasil masuk ke {{ config('app.name', 'MBG Monitor') }}.</p>
+
+        @if (auth()->user()->isPelapor())
+            <p><a href="{{ route('laporan.index') }}">Laporan Saya</a></p>
+        @endif
     </section>
 @endsection

@@ -22,6 +22,14 @@ Route::middleware('auth')->group(function (): void {
         ->middleware('role:pelapor')
         ->name('laporan.index');
 
+    Route::get('/laporan/create', [LaporanController::class, 'create'])
+        ->middleware('role:pelapor')
+        ->name('laporan.create');
+
+    Route::post('/laporan', [LaporanController::class, 'store'])
+        ->middleware('role:pelapor')
+        ->name('laporan.store');
+
     Route::get('/laporan/{laporan}', [LaporanController::class, 'show'])
         ->name('laporan.show');
 });
