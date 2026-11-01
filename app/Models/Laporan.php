@@ -60,6 +60,11 @@ class Laporan extends Model
         return $this->hasMany(PenerusanInformasi::class, 'laporan_id');
     }
 
+    public function pernahDiteruskan(): bool
+    {
+        return $this->penerusanInformasi()->exists();
+    }
+
     public function logStatusLaporan(): HasMany
     {
         return $this->hasMany(LogStatusLaporan::class, 'laporan_id');
