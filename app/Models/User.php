@@ -6,20 +6,10 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
-    protected $table = 'users';
-    protected $primaryKey = 'id_user';
-    public $incrementing = false;
-    protected $keyType = 'string';
-    public $timestamps = false;
-
     protected $fillable = [
-        'id_user',
-        'nama_lengkap',
-        'email',
         'username',
+        'nama_lengkap',
         'password',
-        'no_hp',
-        'alamat',
     ];
 
     protected $hidden = ['password'];
