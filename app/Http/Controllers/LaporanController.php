@@ -8,21 +8,52 @@ use App\Models\Distribusi;
 use App\Models\Laporan;
 use App\Models\Sekolah;
 use App\Services\LaporanService;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class LaporanController extends Controller
 {
     public function index(Request $request)
     {
-        $laporan = $request->user()->laporan()
-            ->with('distribusi.sekolah')
-            ->latest()
-            ->get();
+        $statusOptions = [
+            Laporan::STATUS_DIKIRIM => 'Dikirim',
+            Laporan::STATUS_SEDANG_DITINJAU => 'Sedang ditinjau',
+            Laporan::STATUS_PERLU_DILENGKAPI => 'Perlu dilengkapi',
+            Laporan::STATUS_DITANDAI_UNTUK_DITERUSKAN => 'Ditandai untuk diteruskan',
+            Laporan::STATUS_INFORMASI_DITERUSKAN => 'Informasi diteruskan',
+            Laporan::STATUS_DITUTUP => 'Ditutup',
+        ];
 
-        return view('laporan.index', compact('laporan'));
+        $filters = $request->validate([
+            'q' => ['nullable', 'string', 'max:100'],
+            'status' => ['nullable', Rule::in(array_keys($statusOptions))],
+        ]);
+
+        $query = $request->user()->laporan()
+            ->with('distribusi.sekolah')
+            ->when($filters['q'] ?? null, function (Builder $query, string $search): void {
+                $search = trim($search);
+                $pattern = "%{$search}%";
+
+                $query->where(function (Builder $query) use ($pattern): void {
+                    $query->where('gejala', 'like', $pattern)
+                        ->orWhere('uraian', 'like', $pattern)
+                        ->orWhereHas('distribusi', function (Builder $query) use ($pattern): void {
+                            $query->where('menu', 'like', $pattern)
+                                ->orWhereHas('sekolah', fn (Builder $query) => $query->where('nama', 'like', $pattern));
+                        });
+                });
+            })
+            ->when($filters['status'] ?? null, fn (Builder $query, string $status) => $query->where('status', $status))
+            ->latest();
+
+        $laporan = $query->paginate(5)->withQueryString();
+
+        return view('laporan.index', compact('laporan', 'filters', 'statusOptions'));
     }
 
     public function create()
