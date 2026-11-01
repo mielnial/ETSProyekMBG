@@ -30,6 +30,14 @@
         <dt>Status</dt>
         <dd>{{ ucfirst(str_replace('_', ' ', $laporan->status)) }}</dd>
 
+        @if ($laporan->bukti_path)
+            <dt>Bukti</dt>
+            <dd>
+                <a href="{{ route('laporan.bukti', $laporan) }}">Unduh bukti</a>
+                <span>({{ $laporan->bukti_nama_asli }})</span>
+            </dd>
+        @endif
+
         @if (auth()->user()->isPemantau())
             <dt>Pelapor</dt>
             <dd>{{ $laporan->pelapor->nama_lengkap }}</dd>

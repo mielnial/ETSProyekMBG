@@ -29,6 +29,7 @@ class StoreLaporanRequest extends FormRequest
             'jumlah_terdampak' => ['required', 'integer', 'min:1'],
             'gejala' => ['required', 'string', 'max:2000'],
             'uraian' => ['required', 'string', 'max:5000'],
+            'bukti' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048'],
         ];
     }
 }

@@ -8,6 +8,7 @@ use App\Models\Laporan;
 use App\Services\LaporanService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 
 class LaporanController extends Controller
 {
@@ -53,5 +54,20 @@ class LaporanController extends Controller
         }
 
         return view('laporan.show', compact('laporan'));
+    }
+
+    public function downloadBukti(Laporan $laporan)
+    {
+        Gate::authorize('view', $laporan);
+
+        abort_unless($laporan->bukti_path, 404);
+
+        $disk = Storage::disk('private');
+        abort_unless($disk->exists($laporan->bukti_path), 404);
+
+        return $disk->download(
+            $laporan->bukti_path,
+            $laporan->bukti_nama_asli ?? basename($laporan->bukti_path),
+        );
     }
 }

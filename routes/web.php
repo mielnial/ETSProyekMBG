@@ -30,6 +30,9 @@ Route::middleware('auth')->group(function (): void {
         ->middleware('role:pelapor')
         ->name('laporan.store');
 
+    Route::get('/laporan/{laporan}/bukti', [LaporanController::class, 'downloadBukti'])
+        ->name('laporan.bukti');
+
     Route::get('/laporan/{laporan}', [LaporanController::class, 'show'])
         ->name('laporan.show');
 });

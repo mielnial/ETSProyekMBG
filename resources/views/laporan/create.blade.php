@@ -5,7 +5,7 @@
 @section('content')
     <h2>Buat Laporan</h2>
 
-    <form method="POST" action="{{ route('laporan.store') }}">
+    <form method="POST" action="{{ route('laporan.store') }}" enctype="multipart/form-data">
         @csrf
 
         <div>
@@ -66,6 +66,14 @@
             <label for="uraian">Uraian</label>
             <textarea id="uraian" name="uraian" maxlength="5000" required>{{ old('uraian') }}</textarea>
             @error('uraian')
+                <p role="alert">{{ $message }}</p>
+            @enderror
+        </div>
+
+        <div>
+            <label for="bukti">Bukti (JPG, JPEG, PNG, atau PDF; maksimal 2 MB)</label>
+            <input id="bukti" type="file" name="bukti" accept=".jpg,.jpeg,.png,.pdf,image/jpeg,image/png,application/pdf">
+            @error('bukti')
                 <p role="alert">{{ $message }}</p>
             @enderror
         </div>
